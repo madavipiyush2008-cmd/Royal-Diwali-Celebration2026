@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080b20">
+<title>Royal Diwali Celebration</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{overflow:hidden;height:100vh;background:#080b20;color:white;font-family:Georgia,serif}
+canvas{position:fixed;inset:0;width:100%;height:100%}
+.scene{position:fixed;inset:0;background:radial-gradient(ellipse at center,rgba(255,173,65,.18),transparent 65%),linear-gradient(180deg,#080b20aa,#17132b55);pointer-events:none}
+.moon{position:absolute;right:12%;top:9%;width:65px;height:65px;border-radius:50%;background:#fff0bd;box-shadow:0 0 40px #ffdb83}
+.top{position:absolute;top:5%;width:100%;text-align:center;color:#ffd98a;letter-spacing:4px;font-size:11px}
+.center{position:absolute;top:23%;width:100%;display:flex;flex-direction:column;align-items:center;text-align:center}
+.rangoli{width:min(72vw,290px);aspect-ratio:1;border-radius:50%;border:3px double #e9b66e;display:flex;align-items:center;justify-content:center;position:relative;background:radial-gradient(circle,#4c2444,#17112c);box-shadow:0 0 35px #e7a05b,inset 0 0 30px #e7a05b;animation:glow 3s infinite alternate}
+.rangoli:before{content:"";position:absolute;inset:12px;border:3px dashed #ffcf83;border-radius:50%}
+.rangoli:after{content:"✿  ❀  ✿  ❀";position:absolute;inset:-19px;border:2px dotted #f6cb80;border-radius:50%;color:#ffd58b;font-size:17px}
+h1{font-size:clamp(40px,10vw,70px);line-height:1.05;font-style:italic;color:#ffe2a3;text-shadow:0 0 15px #ff9e46,0 0 35px #e7a05b}
+.subtitle{margin-top:13px;color:#ffe0a6;font:11px Arial;letter-spacing:4px}
+.message{margin-top:22px;color:#ffe3b3;font-size:13px}
+@keyframes glow{to{box-shadow:0 0 60px #ffc36c,inset 0 0 40px #ffbc70}}
+.diyas{position:absolute;bottom:11%;width:100%;display:flex;justify-content:space-evenly;align-items:end}
+.diya{position:relative;width:clamp(55px,17vw,100px);height:43px;border-radius:15px 15px 50% 50%;background:linear-gradient(#ffc77a,#a64429 65%,#351343);border:2px solid #efbd70;box-shadow:0 8px 25px #ff813d88}
+.diya:nth-child(even){transform:translateY(-25px)}
+.flame{position:absolute;left:50%;top:-40px;width:19px;height:40px;transform:translateX(-50%);transform-origin:bottom;border-radius:50% 50% 40% 40%;background:linear-gradient(to top,#ff4a00,#ffba36,#fff8d6);box-shadow:0 0 25px #ff8a26,0 0 45px #ffad35;animation:flicker .3s infinite alternate}
+@keyframes flicker{from{transform:translateX(-50%) rotate(-7deg) scale(.9)}to{transform:translateX(-50%) rotate(7deg) scale(1.1)}}
+.footer{position:absolute;bottom:3%;width:100%;text-align:center;font:10px Arial;letter-spacing:2px;color:#ffdfa2}
+.music-panel{position:absolute;z-index:5;bottom:20%;left:50%;transform:translateX(-50%);width:90%;max-width:310px;text-align:center;pointer-events:auto}
+.music-panel button{border:1px solid #ffd27f;border-radius:30px;padding:12px 18px;color:#ffe7b5;background:linear-gradient(135deg,#612a47,#17132e);font-size:13px;margin:4px;box-shadow:0 0 15px #f6a94b55}
+.controls{position:absolute;z-index:5;right:12px;top:15px}
+.controls button{padding:9px;border:1px solid #e7bc77;border-radius:25px;background:#18152d;color:#ffe5aa}
+</style>
+</head>
+<body>
+<canvas id="sky"></canvas>
+<div class="scene">
+ <div class="moon"></div>
+ <div class="top">✦ THE ROYAL FESTIVAL OF LIGHTS ✦</div>
+ <div class="center">
+  <div class="rangoli">
+   <div><h1>Happy<br>Diwali</h1><div class="subtitle">FESTIVAL OF LIGHTS</div></div>
+  </div>
+  <div class="message">May your life shine with happiness ✨</div>
+ </div>
+ <div class="diyas">
+  <div class="diya"><div class="flame"></div></div>
+  <div class="diya"><div class="flame"></div></div>
+  <div class="diya"><div class="flame"></div></div>
+  <div class="diya"><div class="flame"></div></div>
+  <div class="diya"><div class="flame"></div></div>
+ </div>
+ <div class="music-panel">
+  <button id="start">🪔 Start Celebration &amp; Music</button>
+  <button id="music">🔊 Music ON</button>
+ </div>
+ <div class="footer">✦ LIGHT • LOVE • JOY • PROSPERITY ✦</div>
+ <div class="controls"><button id="fullscreen">⛶</button></div>
+</div>
+<audio id="song" src="happy%20diwali%20funny.m4a" preload="auto"></audio>
+<script>
+const canvas=document.getElementById("sky");
+const ctx=canvas.getContext("2d");
+const song=document.getElementById("song");
+let W,H,stars=[],particles=[],rockets=[];
+let musicOn=true;
+const colors=["#ffdc70","#ff65a3","#65eaff","#bd91ff","#ff934b","#ffffff","#80ffb5"];
+function resize(){W=canvas.width=innerWidth;H=canvas.height=innerHeight}
+resize();
+window.addEventListener("resize",resize);
+for(let i=0;i<100;i++){stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*2,a:Math.random()*6})}
+function burst(x,y){
+ let color=colors[Math.floor(Math.random()*colors.length)];
+ for(let i=0;i<100;i++){
+  let angle=Math.PI*2*i/100,speed=1+Math.random()*4;
+  particles.push({x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,life:80+Math.random()*30,color,size:1+Math.random()*2});
+ }
+}
+function launch(){rockets.push({x:Math.random()*W,y:H,target:Math.random()*H*.5+30,speed:4+Math.random()*3,color:colors[Math.floor(Math.random()*colors.length)]})}
+function draw(){
+ let g=ctx.createLinearGradient(0,0,W,H);
+ g.addColorStop(0,"#080b20");g.addColorStop(.5,"#20274b");g.addColorStop(1,"#392039");
+ ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ stars.forEach(s=>{s.a+=.03;ctx.globalAlpha=.3+Math.sin(s.a)*.5;ctx.fillStyle="#fff4d3";ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill()});
+ ctx.globalAlpha=1;
+ for(let i=rockets.length-1;i>=0;i--){
+  const r=rockets[i];r.y-=r.speed;ctx.fillStyle=r.color;ctx.shadowBlur=15;ctx.shadowColor=r.color;ctx.beginPath();ctx.arc(r.x,r.y,3,0,Math.PI*2);ctx.fill();
+  if(r.y<=r.target){burst(r.x,r.y);rockets.splice(i,1)}
+ }
+ particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vx*=.985;p.vy*=.985;p.vy+=.02;p.life--;ctx.globalAlpha=Math.max(0,p.life/110);ctx.fillStyle=p.color;ctx.shadowBlur=12;ctx.shadowColor=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill()});
+ ctx.globalAlpha=1;ctx.shadowBlur=0;particles=particles.filter(p=>p.life>0);
+ if(Math.random()<.04&&rockets.length<5)launch();
+ requestAnimationFrame(draw);
+}
+draw();
+setTimeout(()=>burst(W*.5,H*.2),500);
+setTimeout(()=>burst(W*.2,H*.3),1200);
+setTimeout(()=>burst(W*.8,H*.3),1800);
+document.addEventListener("pointerdown",e=>{if(e.target.closest("button"))return;burst(e.clientX,e.clientY)});
+document.getElementById("start").onclick=async()=>{
+ try{song.muted=!musicOn;await song.play();document.getElementById("start").textContent="🎉 Celebration Started!";burst(W*.5,H*.35)}
+ catch(e){alert("Audio nahi mil raha. Repository ke main folder me exactly "happy diwali funny.m4a" naam ki file upload karo.")}
+};
+document.getElementById("music").onclick=()=>{
+ musicOn=!musicOn;song.muted=!musicOn;
+ document.getElementById("music").textContent=musicOn?"🔊 Music ON":"🔇 Music OFF";
+};
+document.getElementById("fullscreen").onclick=()=>{
+ if(!document.fullscreenElement){document.documentElement.requestFullscreen?.()}
+ else{document.exitFullscreen?.()}
+};
+</script>
+</body>
+</html>
